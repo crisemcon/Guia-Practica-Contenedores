@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm-nodejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm-nodejs
+  template:
+    metadata:
+      labels:
+        app: sm-nodejs
+    spec:
+      containers:
+        - name: sm-nodejs
+          image: nodejs-studentmanagement
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MYSQL_HOST
+              value: sm-mysql
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: sm-mysql-secret
+                  key: sm-mysql-smuser
+            - name: MYSQL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: sm-mysql-secret
+                  key: sm-mysql-smpass
+            - name: MYSQL_DB
+              valueFrom:
+                secretKeyRef:
+                  name: sm-mysql-secret
+                  key: sm-mysql-db

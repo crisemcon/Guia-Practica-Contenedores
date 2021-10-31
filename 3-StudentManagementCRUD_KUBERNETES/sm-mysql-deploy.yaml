@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm-mysql
+spec:
+  selector:
+    matchLabels:
+      app: sm-mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sm-mysql
+    spec:
+      containers:
+      - image: mysql:5.7
+        name: sm-mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sm-mysql-secret
+              key: sm-mysql-root-pass
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: sm-mysql-secret
+              key: sm-mysql-smuser
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sm-mysql-secret
+              key: sm-mysql-smpass
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: sm-mysql-secret
+              key: sm-mysql-db
+        ports:
+        - containerPort: 3306
+          name: sm-mysql
+        volumeMounts:
+        - name: sm-mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: sm-mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: sm-mysql-pv-claim

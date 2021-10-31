@@ -1,0 +1,48 @@
+version: "3.2"
+services:
+    nodejs:
+        build:
+            context: .
+        image: nodejs-studentmanagement
+        depends_on:
+            - mysql
+        networks:
+            - frontend
+            - backend
+        environment:
+            - MYSQL_HOST=mysql-studentmanagement
+            - MYSQL_USER=smuser
+            - MYSQL_PASS=smpass
+            - MYSQL_DB=studentmanagementdb
+        volumes:
+            - ./www/:/var/www/html
+        ports:
+            - "30001:8080"
+        container_name: nodejs-studentmanagement
+    mysql:
+        image: mysql:5.7
+        networks:
+            - backend
+        environment: 
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_USER=smuser
+            - MYSQL_PASSWORD=smpass
+            - MYSQL_DATABASE=studentmanagementdb
+        container_name: mysql-studentmanagement
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:4.7
+        depends_on:
+            - mysql
+        networks:
+            - backend
+        ports: 
+            - "30002:80"
+        environment: 
+            - PMA_HOST=mysql-studentmanagement
+            - PMA_PORT= 3306
+        volumes:
+            - /sessions
+        container_name: phpmyadmin-studentmanagement
+networks:
+    frontend:
+    backend:
